@@ -1,5 +1,5 @@
 # aws_lambda_rs
-Deploy and run an AWS lambda (Rust) function.
+Deploy and run a Rust AWS lambda function.
 
 ## Requirements
 ```
