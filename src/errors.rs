@@ -27,6 +27,12 @@ pub enum LambdaError {
 
     #[error("BytestreamError")]
     ByteStreamError(#[from] ByteStreamError),
+
+    #[error("DynamoDBError")]
+    DynamoDBError(String),
+
+    #[error("S3GetObjectError")]
+    S3GetObjectError(String),
 }
 
 impl From<LambdaError> for Diagnostic {
@@ -37,9 +43,11 @@ impl From<LambdaError> for Diagnostic {
             LambdaError::SerializationError(error_message) => ("SerializationError", error_message),
             LambdaError::InvalidS3UrlError(error_message) => ("InvalidS3Url", error_message),
             LambdaError::S3UploadError(error_message) => ("S3UploadError", error_message),
-            LambdaError::RegexError(regex_error) => ("RegexError", regex_error.to_string()),
+            LambdaError::RegexError(e) => ("RegexError", e.to_string()),
             LambdaError::IoError(e) => ("IoError", e.to_string()),
             LambdaError::ByteStreamError(e) => ("ByteStreamError", e.to_string()),
+            LambdaError::DynamoDBError(error_message) => ("DynamoDBError", error_message),
+            LambdaError::S3GetObjectError(error_message) => ("S3GetObjectError", error_message),
         };
 
         Diagnostic {

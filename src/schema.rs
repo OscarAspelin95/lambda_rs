@@ -10,8 +10,8 @@ pub struct CustomEvent {
 impl CustomEvent {
     pub fn mock() -> Self {
         Self {
-            input_s3_url: "s3://input_bucket/key".to_string(),
-            output_s3_url: "s3://output_bucket/key".to_string(),
+            input_s3_url: "s3://input-test/test.txt".to_string(),
+            output_s3_url: "s3://output-test/success.txt".to_string(),
         }
     }
 }

@@ -24,6 +24,7 @@ impl TryFrom<String> for S3Url {
 }
 
 pub trait S3UrlParts {
+    fn url(&self) -> String;
     fn bucket(&self) -> String;
     fn key(&self) -> String;
     fn basename(&self) -> String;
@@ -31,6 +32,10 @@ pub trait S3UrlParts {
 }
 
 impl S3UrlParts for S3Url {
+    fn url(&self) -> String {
+        format!("s3://{}/{}", self.bucket, self.key)
+    }
+
     fn bucket(&self) -> String {
         self.bucket.clone()
     }
