@@ -6,7 +6,11 @@ use tracing_subscriber;
 
 mod errors;
 mod lambda_func;
+mod s3;
 mod schema;
+
+#[cfg(test)]
+mod tests;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -16,23 +20,4 @@ async fn main() -> Result<(), Error> {
     let func = service_fn(func);
     lambda_runtime::run(func).await?;
     Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use crate::schema::CustomEvent;
-
-    use super::*;
-    use lambda_runtime::{Context, LambdaEvent};
-
-    #[tokio::test]
-    async fn test_lambda_func() {
-        let event = LambdaEvent::new(CustomEvent::mock(), Context::default());
-        let result = func(event).await;
-
-        match result {
-            Ok(msg) => assert_eq!(msg, "test_msg".to_string()),
-            _ => panic!("expected Ok(msg), not Err"),
-        }
-    }
 }

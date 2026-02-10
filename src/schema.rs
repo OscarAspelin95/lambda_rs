@@ -2,14 +2,16 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomEvent {
-    pub msg: String,
+    pub input_s3_url: String,
+    pub output_s3_url: String,
 }
 
 #[cfg(test)]
 impl CustomEvent {
     pub fn mock() -> Self {
         Self {
-            msg: "test_msg".to_string(),
+            input_s3_url: "s3://input_bucket/key".to_string(),
+            output_s3_url: "s3://output_bucket/key".to_string(),
         }
     }
 }

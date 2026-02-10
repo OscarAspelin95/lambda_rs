@@ -1,3 +1,4 @@
+use aws_sdk_s3::primitives::ByteStreamError;
 use lambda_runtime::Diagnostic;
 use thiserror::Error;
 
@@ -23,6 +24,9 @@ pub enum LambdaError {
 
     #[error("IO error: {0}")]
     IoError(#[from] std::io::Error),
+
+    #[error("BytestreamError")]
+    ByteStreamError(#[from] ByteStreamError),
 }
 
 impl From<LambdaError> for Diagnostic {
@@ -34,7 +38,8 @@ impl From<LambdaError> for Diagnostic {
             LambdaError::InvalidS3UrlError(error_message) => ("InvalidS3Url", error_message),
             LambdaError::S3UploadError(error_message) => ("S3UploadError", error_message),
             LambdaError::RegexError(regex_error) => ("RegexError", regex_error.to_string()),
-            LambdaError::IoError(io_error) => ("IoError", io_error.to_string()),
+            LambdaError::IoError(e) => ("IoError", e.to_string()),
+            LambdaError::ByteStreamError(e) => ("ByteStreamError", e.to_string()),
         };
 
         Diagnostic {
