@@ -64,3 +64,23 @@ aws lambda update-function-code \
 ```bash
 aws lambda invoke --function-name "lambda_rs_function" --payload '{"msg": "MyMessage"}' --cli-binary-format raw-in-base64-out out.json
 ```
+
+# Running with terraform
+Configure
+```bash
+cd terraform
+terraform init
+terraform validate
+```
+
+Build binary (no zip).
+```bash
+cargo lambda build --release --x86-64
+```
+
+Deploy with terraform
+```bash
+cd terraform
+terraform plan
+terraform apply
+```
