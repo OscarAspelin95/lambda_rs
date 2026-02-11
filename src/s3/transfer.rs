@@ -37,10 +37,12 @@ where
     info!("uploading url to dynamodb");
     let url_av = AttributeValue::S(url_parts.url());
     let uuid_av = AttributeValue::S(uuid::Uuid::now_v7().to_string());
+    let table_name =
+        std::env::var("DYNAMODB_TABLE").map_err(|e| LambdaError::EnvError(e.to_string()))?;
 
     let request = dynamodb_client
         .put_item()
-        .table_name("dynamodb-development") // FIX ME
+        .table_name(table_name)
         .item("Uuid", uuid_av)
         .item("Url", url_av);
 

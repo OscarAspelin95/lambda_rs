@@ -1535,6 +1535,7 @@ dependencies = [
  "aws-config",
  "aws-sdk-dynamodb",
  "aws-sdk-s3",
+ "bytes",
  "dotenv",
  "lambda_runtime",
  "regex",

@@ -10,6 +10,7 @@ ziglang
 rust
 cargo-lambda
 terraform
+docker
 ```
 
 # Running with terraform
@@ -43,4 +44,38 @@ with a `payload.json` file like
 	"input_s3_url": "s3://...",
 	"output_s3_url": "s3://..."
 }
+```
+
+# Local Development
+Requires a .env file
+```
+# rust aws-sdk-s3
+AWS_ENDPOINT_URL_S3=http://localhost:9000
+AWS_ENDPOINT_URL_DYNAMODB=http://localhost:8000
+AWS_REGION=""
+AWS_ACCESS_KEY_ID=""
+AWS_SECRET_ACCESS_KEY=""
+MINIO_ROOT_USER=""
+MINIO_ROOT_PASSWORD=""
+DYNAMODB_TABLE=""
+
+## docker dynamodb-ui
+DYNAMO_ENDPOINT=http://dynamodb:8000
+```
+
+## Getting started
+Start services
+```bash
+make docker-start
+```
+
+Test functionality
+```bash
+cargo test
+```
+
+Endpoints
+```
+MinIO UI 		http://localhost:9001
+DynamoDB UI 		http://localhost:8001
 ```

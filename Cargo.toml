@@ -19,3 +19,4 @@ uuid = {version = "1.19.0", features = ["v7"]}
 rstest = {version = "0.26.1"}
 tempfile = "3.25.0"
 dotenv = {version = "0.15.0"}
+bytes = {version = "1.11.0"}

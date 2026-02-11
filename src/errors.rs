@@ -28,11 +28,14 @@ pub enum LambdaError {
     #[error("BytestreamError")]
     ByteStreamError(#[from] ByteStreamError),
 
-    #[error("DynamoDBError")]
+    #[error("DynamoDBError: {0}")]
     DynamoDBError(String),
 
-    #[error("S3GetObjectError")]
+    #[error("S3GetObjectError: {0}")]
     S3GetObjectError(String),
+
+    #[error("EnvError: {0}")]
+    EnvError(String),
 }
 
 impl From<LambdaError> for Diagnostic {
@@ -48,6 +51,7 @@ impl From<LambdaError> for Diagnostic {
             LambdaError::ByteStreamError(e) => ("ByteStreamError", e.to_string()),
             LambdaError::DynamoDBError(error_message) => ("DynamoDBError", error_message),
             LambdaError::S3GetObjectError(error_message) => ("S3GetObjectError", error_message),
+            LambdaError::EnvError(error_message) => ("EnvError", error_message),
         };
 
         Diagnostic {
