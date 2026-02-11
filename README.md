@@ -5,15 +5,15 @@ This particular function only downloads a file from s3, uploads it to another bu
 
 
 ## Requirements
-```
-aws account with credits
-aws cli
-ziglang
-rust
-cargo-lambda
-terraform
-docker
-```
+
+- AWS account (with credits)
+- AWS cli
+- ziglang
+- rust
+- cargo-lambda
+- terraform
+- docker
+
 
 # Running with terraform
 Configure
@@ -35,7 +35,7 @@ terraform plan
 terraform apply
 ```
 
-Get resource info
+Get resource info such as function name, buckets, etc.
 ```bash
 # all resources
 terraform output -json > resources.json
@@ -46,7 +46,7 @@ terraform output -json | jq .<key>.value
 
 Invoke function
 ```bash
-aws lambda invoke --function-name "lambda-rs-development" --payload file://payload.json --cli-binary-format raw-in-base64-out out.json
+aws lambda invoke --function-name <function_name> --payload file://payload.json --cli-binary-format raw-in-base64-out out.json
 ```
 
 with a `payload.json` file that specifies the input and output s3 urls. Check the terraform output to get the values for `<input_bucket>` and `<output_bucket>`. Remember that `s3://<input_bucket>/<file>` must exist. 
@@ -58,7 +58,13 @@ with a `payload.json` file that specifies the input and output s3 urls. Check th
 ```
 
 # Local Development
-Requires a .env file
+Uses `docker-compose` with the following service:
+- minio (mocks aws s3)
+- dynamodb-local (mocks aws dynamodb)
+- dynamodb-ui
+
+## Environment
+Requires a `.env` file:
 ```
 AWS_ENDPOINT_URL_S3=http://localhost:9000
 AWS_ENDPOINT_URL_DYNAMODB=http://localhost:8000
@@ -86,9 +92,9 @@ Test functionality
 cargo test
 ```
 
-Endpoints
-```
-MinIO UI 		http://localhost:9001
-DynamoDB UI 		http://localhost:8001
+UI Endpoints
 
-```
+| Service | Url |
+| --- | ----------- |
+| MinIO UI | http://localhost:9001 |
+| DynamoDB UI | http://localhost:8001 |
