@@ -36,6 +36,15 @@ pub enum LambdaError {
 
     #[error("EnvError: {0}")]
     EnvError(String),
+
+    #[error("Command error: {0}")]
+    CommandError(String),
+
+    #[error("Deserialization error: {0}")]
+    DeserializationError(#[from] serde_json::Error),
+
+    #[error("File does not exist: {0}")]
+    FileDoesNotExistError(String),
 }
 
 impl From<LambdaError> for Diagnostic {
@@ -52,6 +61,11 @@ impl From<LambdaError> for Diagnostic {
             LambdaError::DynamoDBError(error_message) => ("DynamoDBError", error_message),
             LambdaError::S3GetObjectError(error_message) => ("S3GetObjectError", error_message),
             LambdaError::EnvError(error_message) => ("EnvError", error_message),
+            LambdaError::CommandError(error_message) => ("CommandError", error_message),
+            LambdaError::DeserializationError(e) => ("DeserializationError", e.to_string()),
+            LambdaError::FileDoesNotExistError(error_message) => {
+                ("FileDoesNotExistError", error_message)
+            }
         };
 
         Diagnostic {

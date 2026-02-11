@@ -5,6 +5,7 @@ use tracing::{self, info};
 use tracing_subscriber;
 
 mod errors;
+mod ffmpeg;
 mod lambda_func;
 mod s3;
 mod schema;

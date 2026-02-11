@@ -1,7 +1,10 @@
 # aws_lambda_rs
 Let's build, deploy and run a basic Rust AWS lambda function.
 
-This particular function only downloads a file from s3, uploads it to another bucket and writes the output url to dynamodb. However, with these concepts in place, it can easily be extended to perform more powerful tasks.
+This a work in progress, but the goal is to have a AWS lambda function that:
+- Accepts different kinds of media files (video, image, etc) stored in s3.
+- Processes these with `ffmpeg`.
+- Uploads the processed artifacts on s3 
 
 
 ## Requirements
@@ -13,7 +16,27 @@ This particular function only downloads a file from s3, uploads it to another bu
 - cargo-lambda
 - terraform
 - docker
+- ffmpeg and ffprobe binaries
 
+
+# FFMPEG binaries
+Our lambda function will have a layer containing the `ffmpeg` and `ffprobe` binaries. These must be present in the root directory as
+```bash
+./layer/ffmpeg/bin/ffmpeg
+./layer/ffmpeg/bin/ffprobe
+```
+
+Typically, you'd do something like this (considering that the version might be different).
+```bash
+mkdir -p ./layer/ffmpeg/bin && cd ./layer/ffmpeg/bin
+wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+tar -xvf ffmpeg-release-amd64-static.tar.xz
+mv ffmpeg-7.0.2-amd64-static/ffmpeg ffmpeg-7.0.2-amd64-static/ffprobe .
+
+# cleanup
+rm ffmpeg-release-amd64-static.tar.xz
+rm -rf ffmpeg-7.0.2-amd64-static/ffmpeg
+```
 
 # Running with terraform
 Configure

@@ -8,6 +8,7 @@ use aws_sdk_s3::Client as S3Client;
 use aws_sdk_s3::primitives::ByteStream;
 use dotenv;
 use lambda_runtime::{Context, LambdaEvent};
+use uuid::Uuid;
 
 /// setup for making lambda function run with minio:
 /// - create input/output bucket for input/output files.
@@ -19,7 +20,6 @@ async fn get_mock_event(client: &S3Client, msg: &'static [u8]) -> Result<CustomE
     ensure_bucket(&client, &input_url.bucket).await?;
     ensure_bucket(&client, &output_url.bucket).await?;
 
-    // upload
     let body = ByteStream::from_static(msg);
 
     client
@@ -51,7 +51,10 @@ async fn test_lambda_func() -> Result<(), LambdaError> {
     let mock_event = get_mock_event(&clients.s3, &msg).await?;
     let event = LambdaEvent::new(mock_event.clone(), Context::default());
     let result = func(event).await?;
-    assert_eq!(result, "success".to_string());
+
+    // Make sure we get back a valid Uuid.
+    let uuid = Uuid::parse_str(&result);
+    assert!(uuid.is_ok());
 
     let s3_output_url = S3Url::try_from(mock_event.output_s3_url)?;
     let bytes = get_object_bytes(&clients.s3, &s3_output_url).await?;

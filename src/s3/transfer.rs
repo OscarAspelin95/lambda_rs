@@ -1,14 +1,16 @@
 use crate::errors::LambdaError;
+use crate::ffmpeg::schema::FFProbe;
 use crate::s3::S3UrlParts;
 use aws_sdk_dynamodb::Client as DynamoDBClient;
 use aws_sdk_dynamodb::types::AttributeValue;
 use aws_sdk_s3::Client as S3Client;
-use aws_sdk_s3::primitives::ByteStream;
+use aws_sdk_s3::primitives::{Blob, ByteStream};
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tokio::fs::create_dir_all;
 use tracing::info;
+use uuid::Uuid;
 
 /// Split into separate functions for s3 upload and db insert.
 /// We need to solve how we get table_name (terraform)?
@@ -16,9 +18,9 @@ pub async fn put_object<T>(
     s3_client: &S3Client,
     dynamodb_client: &DynamoDBClient,
     url_parts: &T,
-    // Fix
+    ffprobe: Option<FFProbe>,
     local_file: &Path,
-) -> Result<(), LambdaError>
+) -> Result<Uuid, LambdaError>
 where
     T: S3UrlParts,
 {
@@ -35,8 +37,11 @@ where
         .map_err(|err| LambdaError::S3UploadError(err.to_string()))?;
 
     info!("uploading url to dynamodb");
+    let uuid = Uuid::now_v7();
     let url_av = AttributeValue::S(url_parts.url());
-    let uuid_av = AttributeValue::S(uuid::Uuid::now_v7().to_string());
+    let uuid_av = AttributeValue::S(uuid.to_string());
+    let ffprobe_av = AttributeValue::B(Blob::from(serde_json::to_vec(&ffprobe)?));
+
     let table_name =
         std::env::var("DYNAMODB_TABLE").map_err(|e| LambdaError::EnvError(e.to_string()))?;
 
@@ -44,7 +49,8 @@ where
         .put_item()
         .table_name(table_name)
         .item("Uuid", uuid_av)
-        .item("Url", url_av);
+        .item("Url", url_av)
+        .item("Meta", ffprobe_av);
 
     let response = request
         .send()
@@ -53,14 +59,14 @@ where
 
     info!("{:?}", response);
 
-    Ok(())
+    Ok(uuid)
 }
 
 pub async fn get_object<T>(
     client: &S3Client,
     url_parts: &T,
     outdir: &Path,
-) -> Result<String, LambdaError>
+) -> Result<PathBuf, LambdaError>
 where
     T: S3UrlParts,
 {
@@ -89,5 +95,5 @@ where
     let mut file = File::create(&local_file)?;
     file.write_all(&bytes)?;
 
-    Ok(local_file)
+    Ok(PathBuf::from(local_file))
 }
