@@ -1,11 +1,13 @@
 # aws_lambda_rs
-Deploy and run a Rust AWS lambda function.
+Let's build, deploy and run a basic Rust AWS lambda function.
 
-## Current status
-Currently, the function is basically a very fancy copy-paste.
+This particular function only downloads a file from s3, uploads it to another bucket and writes the output url to dynamodb. However, with these concepts in place, it can easily be extended to perform more powerful tasks.
+
 
 ## Requirements
 ```
+aws account with credits
+aws cli
 ziglang
 rust
 cargo-lambda
@@ -21,7 +23,7 @@ terraform init
 terraform validate
 ```
 
-Build binary (no zip).
+Build binary (no zip, terraform handles this).
 ```bash
 cargo lambda build --release --x86-64
 ```
@@ -33,31 +35,41 @@ terraform plan
 terraform apply
 ```
 
+Get resource info
+```bash
+# all resources
+terraform output -json > resources.json
+
+# specific key
+terraform output -json | jq .<key>.value
+```
+
 Invoke function
 ```bash
 aws lambda invoke --function-name "lambda-rs-development" --payload file://payload.json --cli-binary-format raw-in-base64-out out.json
 ```
 
-with a `payload.json` file like
+with a `payload.json` file that specifies the input and output s3 urls. Check the terraform output to get the values for `<input_bucket>` and `<output_bucket>`. Remember that `s3://<input_bucket>/<file>` must exist. 
 ```json
 {
-	"input_s3_url": "s3://...",
-	"output_s3_url": "s3://..."
+	"input_s3_url": "s3://<input_bucket>/<file>",
+	"output_s3_url": "s3://<output_bucket>/<file>"
 }
 ```
 
 # Local Development
 Requires a .env file
 ```
-# rust aws-sdk-s3
 AWS_ENDPOINT_URL_S3=http://localhost:9000
 AWS_ENDPOINT_URL_DYNAMODB=http://localhost:8000
 AWS_REGION=""
 AWS_ACCESS_KEY_ID=""
 AWS_SECRET_ACCESS_KEY=""
+DYNAMODB_TABLE=""
+
+## docker minio
 MINIO_ROOT_USER=""
 MINIO_ROOT_PASSWORD=""
-DYNAMODB_TABLE=""
 
 ## docker dynamodb-ui
 DYNAMO_ENDPOINT=http://dynamodb:8000
@@ -78,4 +90,5 @@ Endpoints
 ```
 MinIO UI 		http://localhost:9001
 DynamoDB UI 		http://localhost:8001
+
 ```

@@ -15,4 +15,7 @@ resource "aws_lambda_function" "default" {
   timeout       = 60
   package_type  = "Zip"
   filename      = data.archive_file.default.output_path
+  environment {
+    variables = { "DYNAMODB_TABLE" : aws_dynamodb_table.default.name }
+  }
 }
