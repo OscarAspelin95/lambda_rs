@@ -4,8 +4,11 @@ use tracing::info;
 use tracing_bunyan_formatter::{BunyanFormattingLayer, JsonStorageLayer};
 use tracing_subscriber::Registry;
 use tracing_subscriber::layer::SubscriberExt;
+mod dispatch;
 mod errors;
 mod ffmpeg;
+mod ffprobe;
+mod file_utils;
 mod lambda_func;
 mod s3;
 mod schema;
@@ -14,7 +17,7 @@ mod schema;
 mod tests;
 
 fn setup_tracing() {
-    let formatting_layer = BunyanFormattingLayer::new("axum_tracing".into(), std::io::stdout);
+    let formatting_layer = BunyanFormattingLayer::new("lambda-rs".into(), std::io::stdout);
     let subscriber = Registry::default()
         .with(JsonStorageLayer)
         .with(formatting_layer);

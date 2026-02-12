@@ -3,8 +3,9 @@ Let's build, deploy and run a basic Rust AWS lambda function.
 
 This a work in progress, but the goal is to have a AWS lambda function that:
 - Accepts different kinds of media files (video, image, etc) stored in s3.
+- Extracts metadata with `ffprobe`.
 - Processes these with `ffmpeg`.
-- Uploads the processed artifacts on s3 
+- Uploads the processed artifacts on s3. 
 
 
 ## Requirements

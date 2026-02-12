@@ -1,4 +1,5 @@
 use crate::errors::LambdaError;
+use crate::ffmpeg::FFMpegArtifact;
 use crate::ffmpeg::schema::FFProbe;
 use crate::s3::S3UrlParts;
 use aws_sdk_dynamodb::Client as DynamoDBClient;
@@ -14,14 +15,16 @@ use tracing::info;
 use tracing::instrument;
 use uuid::Uuid;
 
-/// Split into separate functions for s3 upload and db insert.
-/// We need to solve how we get table_name (terraform)?
+/// Here, we need to:
+/// * upload our artifacts under /input-bucket/uuid/<files>.
+/// * add url(s) to dynamodb.
 #[instrument(name = "put_object")]
 pub async fn put_object<T>(
     s3_client: &S3Client,
     dynamodb_client: &DynamoDBClient,
     url_parts: &T,
     ffprobe: Option<FFProbe>,
+    artifact: Option<FFMpegArtifact>,
     local_file: &Path,
 ) -> Result<Uuid, LambdaError>
 where

@@ -1,3 +1,4 @@
-mod ffprobe;
-pub mod schema;
-pub use ffprobe::run_ffprobe;
+mod gif;
+mod schema;
+pub use gif::video_to_gif;
+pub use schema::FFMpegArtifact;

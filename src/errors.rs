@@ -7,9 +7,6 @@ pub enum LambdaError {
     #[error("Unknown error: {0}")]
     UnknownError(String),
 
-    #[error("Failed to run fastq stats: {0}")]
-    FastqStatsError(String),
-
     #[error("Serialization error: {0}")]
     SerializationError(String),
 
@@ -45,13 +42,18 @@ pub enum LambdaError {
 
     #[error("File does not exist: {0}")]
     FileDoesNotExistError(String),
+
+    #[error("Provided file does not have an extension: `{0}`")]
+    MissingFileExtensionError(String),
+
+    #[error("Provided file does not have a parent directory: `{0}`")]
+    MissingParentDirectoryError(String),
 }
 
 impl From<LambdaError> for Diagnostic {
     fn from(value: LambdaError) -> Diagnostic {
         let (error_type, error_message) = match value {
             LambdaError::UnknownError(error_message) => ("UnknownError", error_message),
-            LambdaError::FastqStatsError(error_message) => ("FastqStatsError", error_message),
             LambdaError::SerializationError(error_message) => ("SerializationError", error_message),
             LambdaError::InvalidS3UrlError(error_message) => ("InvalidS3Url", error_message),
             LambdaError::S3UploadError(error_message) => ("S3UploadError", error_message),
@@ -65,6 +67,12 @@ impl From<LambdaError> for Diagnostic {
             LambdaError::DeserializationError(e) => ("DeserializationError", e.to_string()),
             LambdaError::FileDoesNotExistError(error_message) => {
                 ("FileDoesNotExistError", error_message)
+            }
+            LambdaError::MissingFileExtensionError(error_message) => {
+                ("MissingFileExtensionError", error_message)
+            }
+            LambdaError::MissingParentDirectoryError(error_message) => {
+                ("MissingParentDirectoryError", error_message)
             }
         };
 
