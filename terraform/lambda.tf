@@ -16,7 +16,10 @@ resource "aws_lambda_function" "default" {
   package_type  = "Zip"
   filename      = data.archive_file.default.output_path
   environment {
-    variables = { "DYNAMODB_TABLE" : aws_dynamodb_table.default.name }
+    variables = {
+      "DYNAMODB_TABLE"   : aws_dynamodb_table.default.name,
+      "S3_OUTPUT_BUCKET" : aws_s3_bucket.output.id
+    }
   }
   layers = [aws_lambda_layer_version.ffmpeg_layer.arn]
 }

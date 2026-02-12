@@ -2,7 +2,9 @@ use crate::ffmpeg::FFMpegArtifact;
 use crate::ffprobe::schema::CodecName;
 use crate::{errors::LambdaError, file_utils::with_new_extension};
 use std::path::Path;
+use tracing::{debug, error, instrument};
 
+#[instrument(name = "video_to_gif", err)]
 pub fn video_to_gif(video: &Path) -> Result<FFMpegArtifact, LambdaError> {
     let gif = with_new_extension(video, CodecName::Gif)?;
 
@@ -16,9 +18,14 @@ pub fn video_to_gif(video: &Path) -> Result<FFMpegArtifact, LambdaError> {
         .args(["-loop", "0"])
         .arg(gif.display().to_string());
 
-    let _ = cmd
+    let output = cmd
         .output()
         .map_err(|e| LambdaError::CommandError(e.to_string()))?;
+
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        error!(exit_code = ?output.status.code(), %stderr, "ffmpeg video_to_gif failed");
+    }
 
     if !gif.is_file() {
         return Err(LambdaError::FileDoesNotExistError(
@@ -26,7 +33,7 @@ pub fn video_to_gif(video: &Path) -> Result<FFMpegArtifact, LambdaError> {
         ));
     }
 
-    let artifact = FFMpegArtifact { files: vec![gif] };
+    debug!(output = %gif.display(), "GIF created");
 
-    Ok(artifact)
+    Ok(FFMpegArtifact { files: vec![gif] })
 }

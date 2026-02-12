@@ -23,12 +23,12 @@ impl TryFrom<String> for S3Url {
     }
 }
 
+#[allow(dead_code)]
 pub trait S3UrlParts {
     fn url(&self) -> String;
     fn bucket(&self) -> String;
     fn key(&self) -> String;
     fn basename(&self) -> String;
-    fn stem(&self) -> String;
 }
 
 impl S3UrlParts for S3Url {
@@ -52,13 +52,4 @@ impl S3UrlParts for S3Url {
             .to_string()
     }
 
-    fn stem(&self) -> String {
-        let mut basename: &str = &self.basename();
-        basename = basename.trim_start_matches('.');
-
-        match basename.find('.') {
-            Some(idx) if idx > 0 => basename[..idx].to_string(),
-            _ => basename.to_string(),
-        }
-    }
 }

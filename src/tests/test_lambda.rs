@@ -11,14 +11,13 @@ use lambda_runtime::{Context, LambdaEvent};
 use uuid::Uuid;
 
 /// setup for making lambda function run with minio:
-/// - create input/output bucket for input/output files.
+/// - create input/output bucket for input files.
 /// - upload input file to bucket.
 async fn get_mock_event(client: &S3Client, msg: &'static [u8]) -> Result<CustomEvent, LambdaError> {
     let input_url = S3Url::try_from("s3://test-input-bucket/test_input.txt".to_string())?;
-    let output_url = S3Url::try_from("s3://test-output-bucket/output_input.txt".to_string())?;
 
-    ensure_bucket(&client, &input_url.bucket).await?;
-    ensure_bucket(&client, &output_url.bucket).await?;
+    ensure_bucket(client, &input_url.bucket).await?;
+    ensure_bucket(client, "test-output-bucket").await?;
 
     let body = ByteStream::from_static(msg);
 
@@ -33,7 +32,6 @@ async fn get_mock_event(client: &S3Client, msg: &'static [u8]) -> Result<CustomE
 
     let event = CustomEvent {
         input_s3_url: input_url.url(),
-        output_s3_url: output_url.url(),
     };
 
     Ok(event)
@@ -48,16 +46,21 @@ async fn test_lambda_func() -> Result<(), LambdaError> {
     create_dynamodb_table(&clients.dynamodb).await?;
 
     let msg: &'static [u8] = b"test-message";
-    let mock_event = get_mock_event(&clients.s3, &msg).await?;
+    let mock_event = get_mock_event(&clients.s3, msg).await?;
     let event = LambdaEvent::new(mock_event.clone(), Context::default());
     let result = func(event).await?;
 
     // Make sure we get back a valid Uuid.
-    let uuid = Uuid::parse_str(&result);
+    let uuid = Uuid::parse_str(&result.uuid);
     assert!(uuid.is_ok());
 
-    let s3_output_url = S3Url::try_from(mock_event.output_s3_url)?;
-    let bytes = get_object_bytes(&clients.s3, &s3_output_url).await?;
+    // Verify the response structure.
+    assert!(!result.output_urls.is_empty());
+    assert_eq!(result.status, "passthrough");
+
+    // Verify the uploaded file content via the output URL.
+    let output_s3_url = S3Url::try_from(result.output_urls[0].clone())?;
+    let bytes = get_object_bytes(&clients.s3, &output_s3_url).await?;
     assert_eq!(&bytes[..], msg);
 
     Ok(())

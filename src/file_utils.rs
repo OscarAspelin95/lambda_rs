@@ -1,4 +1,4 @@
-use crate::{errors::LambdaError, schema::CodecName};
+use crate::{errors::LambdaError, ffprobe::schema::CodecName};
 use std::path::{Path, PathBuf};
 
 /// Returns a file path with the file extension swapped.

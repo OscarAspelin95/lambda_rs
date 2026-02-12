@@ -1,5 +1,5 @@
 use crate::errors::LambdaError;
-use crate::s3::{S3Url, S3UrlParts};
+use crate::s3::S3UrlParts;
 use aws_sdk_dynamodb::types::{AttributeDefinition, BillingMode, KeySchemaElement};
 use aws_sdk_dynamodb::{Client as DynamoDBClient, types::KeyType};
 use aws_sdk_s3::Client as S3Client;

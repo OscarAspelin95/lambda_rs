@@ -10,7 +10,7 @@ fn test_s3_url(
     #[case] expected_bucket: String,
     #[case] expected_key: String,
     #[case] expected_basename: String,
-    #[case] expected_ext: Option<String>,
+    #[case] _expected_ext: Option<String>,
 ) {
     let s3_url = S3Url::try_from(url).expect("Invalid url");
 

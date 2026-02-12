@@ -68,4 +68,16 @@ impl FFProbe {
             .iter()
             .any(|stream| matches!(stream.codec_type, CodecType::Video))
     }
+
+    pub fn is_image(&self) -> bool {
+        self.streams
+            .iter()
+            .any(|stream| matches!(stream.codec_type, CodecType::Image))
+    }
+
+    pub fn is_png(&self) -> bool {
+        self.streams
+            .iter()
+            .any(|stream| matches!(stream.codec_name, CodecName::Png))
+    }
 }
