@@ -20,3 +20,15 @@ resource "aws_s3_bucket" "output" {
     Environment = "${var.environment}"
   }
 }
+
+
+resource "aws_s3_bucket" "deployment" {
+  bucket_prefix = "deployment-artifacts-${var.environment}-"
+  force_destroy = true
+  region        = var.aws_region
+
+  tags = {
+    Name        = "deployment_artifacts_${var.environment}"
+    Environment = "${var.environment}"
+  }
+}

@@ -16,9 +16,9 @@ impl TryFrom<String> for S3Url {
             Some(caps) => {
                 let bucket = caps["bucket"].to_string();
                 let key = caps["key"].to_string();
-                return Ok(Self { bucket, key });
+                Ok(Self { bucket, key })
             }
-            None => return Err(LambdaError::InvalidS3UrlError(url.to_string())),
+            None => Err(LambdaError::InvalidS3UrlError(url.to_string())),
         }
     }
 }
@@ -45,7 +45,11 @@ impl S3UrlParts for S3Url {
     }
 
     fn basename(&self) -> String {
-        self.key.split('/').last().unwrap_or(&self.key).to_string()
+        self.key
+            .split('/')
+            .next_back()
+            .unwrap_or(&self.key)
+            .to_string()
     }
 
     fn stem(&self) -> String {

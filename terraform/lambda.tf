@@ -28,8 +28,16 @@ data "archive_file" "ffmpeg" {
   output_path = "../layer/ffmpeg.zip"
 }
 
+resource "aws_s3_object" "ffmpeg_layer" {
+  bucket = aws_s3_bucket.deployment.id
+  key    = "layers/ffmpeg-${filebase64sha256(data.archive_file.ffmpeg.output_path)}.zip"
+  source = data.archive_file.ffmpeg.output_path
+  etag   = filemd5(data.archive_file.ffmpeg.output_path)
+}
+
 resource "aws_lambda_layer_version" "ffmpeg_layer" {
-  filename                 = data.archive_file.ffmpeg.output_path
+  s3_bucket                = aws_s3_bucket.deployment.id
+  s3_key                   = aws_s3_object.ffmpeg_layer.key
   description              = "FFmpeg and ffprobe binaries"
   layer_name               = "ffmpeg-${var.environment}"
   source_code_hash         = data.archive_file.ffmpeg.output_base64sha256

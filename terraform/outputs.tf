@@ -18,6 +18,10 @@ output "output_bucket" {
   value = aws_s3_bucket.output.bucket
 }
 
+output "deployment_artifact_bucket" {
+  value = aws_s3_bucket.deployment.bucket
+}
+
 output "lambda_function_name" {
   value = aws_lambda_function.default.function_name
 }

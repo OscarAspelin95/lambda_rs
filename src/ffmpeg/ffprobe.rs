@@ -1,7 +1,10 @@
+use tracing::instrument;
+
 use super::schema::FFProbe;
 use crate::errors::LambdaError;
 use std::path::Path;
 
+#[instrument(name = "run_ffprobe")]
 pub fn run_ffprobe(file: &Path) -> Result<FFProbe, LambdaError> {
     if !file.exists() {
         return Err(LambdaError::FileDoesNotExistError(
