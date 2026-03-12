@@ -18,7 +18,7 @@ aws-sdk-dynamodb = {version = "1.104.0", features = ["behavior-version-latest"]}
 regex = {version = "1.12.2"}
 uuid = {version = "1.19.0", features = ["v7"]}
 rstest = {version = "0.26.1"}
-tempfile = "3.25.0"
+tempfile = "3.27.0"
 dotenv = {version = "0.15.0"}
 bytes = {version = "1.11.0"}
 strum = "0.27"
